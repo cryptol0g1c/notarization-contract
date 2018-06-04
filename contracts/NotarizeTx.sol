@@ -1,7 +1,7 @@
 /*
  Bitsign transaction notarizacion contract v0.1c
 */
-pragma solidity ^0.4.24;
+pragma solidity ^0.4.23;
 
 contract NotarizeTx {
     address owner;
@@ -30,20 +30,19 @@ contract NotarizeTx {
     event newTxEvent(Tx tx);
     function newTx(address _buyer, address _seller, bytes32 _id, uint256 _date,
     uint _value, bytes32 _key) public onlyOwner {
-        Tx _tx = idToTx[_id];
+        Tx storage _tx = idToTx[_id];
         _tx.buyer = _buyer;
         _tx.seller = _seller;
         _tx.id = _id;
-        _tx.date[Status.purchased] = _date;
+        _tx.date = _date;
         _tx.value = _value;
         _tx.key = _key;
         _tx.status = Status.purchased;
-        proofs[_key] = _id;
         emit newTxEvent(_tx);
     }
 
   /* Event trigered when status is updated */
-    event UpdateStatusEvent(Tx tx);
+    event updateStatusEvent(Tx tx);
     /* updateStatus fcn, allows to change status of tx given id */
     function updateStatus(Status _status, bytes32 _id) public onlyOwner{
         idToTx[_id].status = _status;
