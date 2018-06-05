@@ -5,31 +5,32 @@ pragma solidity ^0.4.23;
 
 contract NotarizeTx {
     address owner;
-
+    address operator;
+    bool operatorInstantiated = false;
     constructor() public {
       owner = msg.sender;
     }
 
     enum Status {purchased, confirmed, shiped, recieved, completed}
-    modifier onlyOwner() {
-      require(msg.sender == owner);
+    modifier onlyOwnerOrOperator() {
+      require(msg.sender == owner || (msg.sender == operator && operatorInstantiated == true));
       _;
     }
 
     struct Tx {
         address  buyer;
         address  seller;
-        bytes32  id;
+        bytes4  id;
         uint256 date;
         uint  value;
         bytes32  key;
         Status  status;
     }
     /*  mapping id's => Transactions*/
-    mapping (bytes32 => Tx) public idToTx;
-    event newTxEvent(Tx tx);
-    function newTx(address _buyer, address _seller, bytes32 _id, uint256 _date,
-    uint _value, bytes32 _key) public onlyOwner {
+    mapping (bytes4 => Tx) public idToTx;
+    event newTxEvent(bytes32  key);
+    function newTx(address _buyer, address _seller, bytes4 _id, uint256 _date,
+    uint _value, bytes32 _key) public onlyOwnerOrOperator {
         Tx storage _tx = idToTx[_id];
         _tx.buyer = _buyer;
         _tx.seller = _seller;
@@ -38,14 +39,19 @@ contract NotarizeTx {
         _tx.value = _value;
         _tx.key = _key;
         _tx.status = Status.purchased;
-        emit newTxEvent(_tx);
+        emit newTxEvent(_key);
     }
 
   /* Event trigered when status is updated */
-    event updateStatusEvent(Tx tx);
+    event updateStatusEvent(bytes32  key);
     /* updateStatus fcn, allows to change status of tx given id */
-    function updateStatus(Status _status, bytes32 _id) public onlyOwner{
+    function updateStatus(Status _status, bytes4 _id) public onlyOwnerOrOperator{
         idToTx[_id].status = _status;
-        emit updateStatusEvent(idToTx[_id]);
+        emit updateStatusEvent(idToTx[_id].key);
+    }
+
+    function initializeOperator(address _operator ) public onlyOwnerOrOperator{
+      operator = _operator;
+      operatorInstantiated = true;
     }
 }
