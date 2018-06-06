@@ -12,6 +12,10 @@ contract NotarizeTx {
     }
 
     enum Status {purchased, confirmed, shiped, recieved, completed}
+    modifier onlyOwner() {
+      require(msg.sender == owner);
+      _;
+    }
     modifier onlyOwnerOrOperator() {
       require(msg.sender == owner || (msg.sender == operator && operatorInstantiated == true));
       _;
@@ -49,9 +53,10 @@ contract NotarizeTx {
         idToTx[_id].status = _status;
         emit updateStatusEvent(idToTx[_id].key);
     }
-
-    function initializeOperator(address _operator ) public onlyOwnerOrOperator{
+    event initializeOperatorEvent(address operator);
+    function initializeOperator(address _operator ) public onlyOwner{
       operator = _operator;
       operatorInstantiated = true;
+      emit initializeOperatorEvent(operator);
     }
 }
