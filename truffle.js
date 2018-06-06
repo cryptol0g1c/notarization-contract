@@ -1,6 +1,6 @@
 var HDWalletProvider = require("truffle-hdwallet-provider")
 var mnemonic = "donated making tinsel unfrosted immerse pointed tamer utopia letdown security cherub revolt"
-var public = "0x005B090Faeeb12dccC13E28B5Bf7e1B88736E942"
+//  public key ^^^^^^^^^^^^^^^^^^^^^^^ "0x005B090Faeeb12dccC13E28B5Bf7e1B88736E942"
 require('babel-register')({
   ignore: /node_modules\/(?!zeppelin-solidity)/
 });
@@ -12,6 +12,12 @@ module.exports = {
       host: "localhost",
       port: 8545,
       network_id: "*",
+    },
+    paritykovan: {
+      host: "localhost",
+      port: 8545,
+      network_id: "*",
+      from: "0x44751576b07eee07de3d8d5bfb9c8dd77add1744"
     },
     coverage: {
       host: "localhost",
