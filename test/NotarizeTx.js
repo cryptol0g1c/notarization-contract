@@ -1,4 +1,4 @@
-const NotarizeTx = artifacts.require('NotarizeTx');
+const NotarizeTx = artifacts.require('NotarizeTx')
 
 contract('NotarizeTx', addresses => {
 
@@ -17,7 +17,7 @@ contract('NotarizeTx', addresses => {
   var instance
   var txFromId
   beforeEach(async() => {
-    instance = (await NotarizeTx.new());
+    instance = (await NotarizeTx.new())
   })
 
 /*
@@ -35,12 +35,12 @@ test realizados antes de instancear el operator
           else{
             assert.equal(res[0].args.key, key)
           }
-        });
+        })
       }
       catch(error) {
         assert(false,"The method should not fail")
       }
-    });
+    })
 
     it('Any other address not being Owner cant use newTx when operator is not instantiated', async () => {
       try {
@@ -50,7 +50,7 @@ test realizados antes de instancear el operator
       catch(error) {
         assert(error.toString().includes('revert'), error.toString())
       }
-    });
+    })
 
     it('owner can use updateStatus', async () => {
       await instance.newTx( buyer, seller, id, date, value, key ,{ from: owner})
@@ -73,7 +73,7 @@ test realizados antes de instancear el operator
           else{
             assert.equal(res[0].args.key, key)
           }
-        });
+        })
       }
       catch(error) {
         assert(false,"The method should not fail")
@@ -88,7 +88,7 @@ test realizados antes de instancear el operator
             assert(false,"Could not obtain Tx from Id")
           }
         )
-    });
+    })
 
     it('Any other address not being Owner cant use updateStatus when operator is not instantiated', async () => {
       await instance.newTx( buyer, seller, id, date, value, key ,{ from: owner})
@@ -119,7 +119,7 @@ test realizados antes de instancear el operator
             assert(false,"Could not obtain Tx from Id")
           }
         )
-    });
+    })
     it('owner can use initializeOperator', async () => {
       try {
         await instance.initializeOperator( operator ,{ from: owner})
@@ -130,12 +130,12 @@ test realizados antes de instancear el operator
           else{
             assert.equal(res[0].args.operator, operator)
           }
-        });
+        })
       }
       catch(error) {
         assert(false,"The method should not fail")
       }
-    });
+    })
 
     it('Any other address not being Owner cant use initializeOperator when operator is not instantiated', async () => {
       try {
@@ -145,29 +145,30 @@ test realizados antes de instancear el operator
       catch(error) {
         assert(error.toString().includes('revert'), error.toString())
       }
-    });
+    })
 
-  });
+  })
 
 
 
   describe('NotarizeTx when operatorInstantiated=true', () => {
-    beforeEach(function() {
+    beforeEach(async() => {
       try {
         await instance.initializeOperator( operator ,{ from: owner})
         instance.initializeOperatorEvent().get((error, res) => {
+
           if (error){
             assert(false,"The method should not fail")
           }
           else{
-            assert.equal(res[0].args.operator, operator)
+            //assert.equal(res[0].args.operator, operator)
           }
-        });
+        })
       }
       catch(error) {
         assert(false,"The method should not fail")
       }
-   });
+   })
 
     it('owner can use newTx', async () => {
       try {
@@ -179,14 +180,31 @@ test realizados antes de instancear el operator
           else{
             assert.equal(res[0].args.key, key)
           }
-        });
+        })
       }
       catch(error) {
         assert(false,"The method should not fail")
       }
-    });
+    })
 
-    it('Any other address not being Owner cant use newTx when operator is not instantiated', async () => {
+    it('operator can use newTx', async () => {
+      try {
+        await instance.newTx( buyer, seller, id, date, value, key ,{ from: operator})
+        instance.newTxEvent().get((error, res) => {
+          if (error){
+            assert(false,"The method should not fail")
+          }
+          else{
+            assert.equal(res[0].args.key, key)
+          }
+        })
+      }
+      catch(error) {
+        assert(false,"The method should not fail")
+      }
+    })
+
+    it('Any other address not being Owner either operator cant use newTx', async () => {
       try {
         await instance.newTx( buyer, seller, id, date, value, key , { from: fakeOperator})
         assert.fail()
@@ -194,7 +212,7 @@ test realizados antes de instancear el operator
       catch(error) {
         assert(error.toString().includes('revert'), error.toString())
       }
-    });
+    })
 
     it('owner can use updateStatus', async () => {
       await instance.newTx( buyer, seller, id, date, value, key ,{ from: owner})
@@ -217,7 +235,7 @@ test realizados antes de instancear el operator
           else{
             assert.equal(res[0].args.key, key)
           }
-        });
+        })
       }
       catch(error) {
         assert(false,"The method should not fail")
@@ -232,9 +250,47 @@ test realizados antes de instancear el operator
             assert(false,"Could not obtain Tx from Id")
           }
         )
-    });
+    })
 
-    it('Any other address not being Owner cant use updateStatus when operator is not instantiated', async () => {
+    it('operator can use updateStatus', async () => {
+      await instance.newTx( buyer, seller, id, date, value, key ,{ from: operator})
+      await instance.idToTx( id )
+        .then(
+          function (res) {
+            txFromId = res
+            assert.equal(txFromId[6]*1, 0)
+          },
+          function (err) {
+            assert(false,"Could not obtain Tx from Id")
+          }
+        )
+      try {
+        await instance.updateStatus( statusUpdated, id, { from: operator})
+        instance.updateStatusEvent().get((error, res) => {
+          if (error){
+            assert(false,"The method should not fail")
+          }
+          else{
+            assert.equal(res[0].args.key, key)
+          }
+        })
+      }
+      catch(error) {
+        assert(false,"The method should not fail")
+      }
+      await instance.idToTx( id )
+        .then(
+          function (res) {
+            txFromId = res
+            assert.equal(txFromId[6]*1, statusUpdated)
+          },
+          function (err) {
+            assert(false,"Could not obtain Tx from Id")
+          }
+        )
+    })
+
+    it('Any other address not being Owner either operator cant use updateStatus', async () => {
       await instance.newTx( buyer, seller, id, date, value, key ,{ from: owner})
       await instance.idToTx( id )
         .then(
@@ -263,7 +319,7 @@ test realizados antes de instancear el operator
             assert(false,"Could not obtain Tx from Id")
           }
         )
-    });
+    })
     it('owner can use initializeOperator', async () => {
       try {
         await instance.initializeOperator( operator ,{ from: owner})
@@ -274,14 +330,24 @@ test realizados antes de instancear el operator
           else{
             assert.equal(res[0].args.operator, operator)
           }
-        });
+        })
       }
       catch(error) {
         assert(false,"The method should not fail")
       }
-    });
+    })
 
-    it('Any other address not being Owner cant use initializeOperator when operator is not instantiated', async () => {
+    it('operator cant use initializeOperator', async () => {
+      try {
+        await instance.initializeOperator( operator , { from: operator})
+        assert.fail()
+      }
+      catch(error) {
+        assert(error.toString().includes('revert'), error.toString())
+      }
+    })
+
+    it('Any other address not being Owner cant use initializeOperator', async () => {
       try {
         await instance.initializeOperator( operator , { from: fakeOperator})
         assert.fail()
@@ -289,7 +355,7 @@ test realizados antes de instancear el operator
       catch(error) {
         assert(error.toString().includes('revert'), error.toString())
       }
-    });
+    })
 
-  });
-});
+  })
+})
