@@ -16,8 +16,8 @@ contract('NotarizeTx', addresses => {
   const statusUpdated = 1
   var instance
   var txFromId
-  beforeEach(async() => {
-    instance = (await NotarizeTx.new())
+  before(async() => {
+    instance = await NotarizeTx.at("0x8e368C19992cA5163301041cC0A908F33BEE7F89")
   })
 
 /*
@@ -357,5 +357,22 @@ test realizados antes de instancear el operator
       }
     })
 
+  })
+
+  describe('Checking functionality', () => {
+    it('newTx should create a new pointer to a not null Tx struct', async () => {
+      try {
+        await instance.newTx( buyer, seller, id, date, value, key ,{ from: operator})
+        var res = await instance.idToTx(id)
+        console.log("-------")
+        console.log("-------")
+        console.log("-------")
+        console.log("-------")
+        console.log(res)
+      }
+      catch(error) {
+        assert(false,"The method should not fail")
+      }
+    })
   })
 })
