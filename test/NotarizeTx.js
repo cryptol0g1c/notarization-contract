@@ -1,12 +1,12 @@
 const NotarizeTx = artifacts.require('NotarizeTx')
 
 contract('NotarizeTx', addresses => {
-
-  const owner = addresses[0]
-  const buyer = addresses[1]
-  const seller = addresses[2]
-  const operator = addresses[3]
-  const fakeOperator = addresses[4]
+  console.log('comienza test')
+  const owner = "0x44751576B07eeE07de3D8D5BFb9C8Dd77ADD1744"
+  const buyer = "0x44751576B07eeE07de3D8D5BFb9C8Dd77ADD1745"
+  const seller = "0x44751576B07eeE07de3D8D5BFb9C8Dd77ADD1746"
+  const operator = "0x44751576B07eeE07de3D8D5BFb9C8Dd77ADD1747"
+  const fakeOperator = "0x44751576B07eeE07de3D8D5BFb9C8Dd77ADD1748"
   const id =  "0x785334f8"
   const notUsedId =  "0x785334f9"
   const date = "326462"
@@ -14,17 +14,14 @@ contract('NotarizeTx', addresses => {
   const key =  "0xa06d8c92805e40b767afa80b81b0bdabbea6d10af016a1dd121bc5c6651623a1"
   const status = 0
   const statusUpdated = 1
-  var instance
-  var txFromId
-  before(async() => {
-    instance = await NotarizeTx.at("0x8e368C19992cA5163301041cC0A908F33BEE7F89")
-  })
+  var instance =  async () => {
+    return await NotarizeTx.at("0x8e368C19992cA5163301041cC0A908F33BEE7F89")
+  }
 
-/*
-test realizados antes de instancear el operator
-*/
+
+
   describe('NotarizeTx when operatorInstantiated=false', () => {
-
+    console.log('NotarizeTx when operatorInstantiated=false')
     it('owner can use newTx', async () => {
       try {
         await instance.newTx( buyer, seller, id, date, value, key ,{ from: owner})
