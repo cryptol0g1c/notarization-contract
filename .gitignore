@@ -3,3 +3,4 @@ build
 parity.log
 coverage
 coverage.json
+pass.txt
