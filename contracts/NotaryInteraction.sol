@@ -3,14 +3,20 @@ pragma solidity ^0.4.23;
 import "./NotarizeTx.sol";
 
 contract NotaryInteraction  {
+    address owner;
+    modifier onlyOwner() {
+        require(msg.sender == owner );
+        _;
+    }
 
-    NotarizeTx instance;
-    /* address owner; */
+    NotarizeTx public instance;
+
     constructor (address _t) public {
         instance = NotarizeTx(_t);
-        /* owner = msg.sender; */
+        owner = msg.sender;
     }
-    function initOperator(address _a) public returns (uint){
+
+    function initOperator(address _a) public onlyOwner returns (uint){
         instance.initializeOperator(_a);
         return 0;
     }
