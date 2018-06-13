@@ -7,13 +7,20 @@ contract NotarizeTx {
     address owner;
     address operator;
     bool operatorInstantiated = false;
+    address autorizedContract;
+    bool contractInstantiated = false;
+
     constructor() public {
       owner = msg.sender;
     }
 
     enum Status {purchased, confirmed, shiped, recieved, completed}
     modifier onlyOwner() {
-      require(msg.sender == owner);
+      require(msg.sender == owner );
+      _;
+    }
+    modifier onlyOwnerOrAutorizedContract() {
+      require(msg.sender == owner || (msg.sender == autorizedContract && contractInstantiated == true));
       _;
     }
     modifier onlyOwnerOrOperator() {
@@ -54,9 +61,15 @@ contract NotarizeTx {
         emit updateStatusEvent(idToTx[_id].key);
     }
     event initializeOperatorEvent(address operator);
-    function initializeOperator(address _operator ) public onlyOwner{
+    function initializeOperator(address _operator ) public onlyOwnerOrAutorizedContract{
       operator = _operator;
       operatorInstantiated = true;
       emit initializeOperatorEvent(operator);
+    }
+    event initializeContractEvent(address autorizedContract );
+    function initializeContract(address _contract ) public onlyOwner{
+      autorizedContract = _contract;
+      contractInstantiated = true;
+      emit initializeContractEvent(autorizedContract);
     }
 }
